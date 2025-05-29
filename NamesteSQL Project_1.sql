@@ -15,7 +15,7 @@ Amount: The amount of the transaction. (Number) */
  
 
 
---write a query to print top 5 cities with highest spends and their percentage contribution of total credit card spends.
+##write a query to print top 5 cities with highest spends and their percentage contribution of total credit card spends.
 --steps to follow:
 with city_spend as (
 select city, sum(amount) as city_spend
@@ -26,10 +26,9 @@ select sum(cast(amount as bigint)) as Total_spend from [dbo].[credit_card_transc
 select top 5 cs.city, cs.city_spend,round(cs.city_spend*1.0*100/ct.Total_spend,2) as percentage_contribution
 from city_spend cs, Total_spend ct
 order by cs.city_spend desc
---Observations: if i had to join one column to the entire table  then i need to use crossjoin 
--- error: arthimetic over flow  then convert to bigint, if the number column is int/int gives the int only breaking the original result(i.e.Multiplying by 1.0 implicitly converts the expression to a floating-point (FLOAT) result)
 
---write a query to print highest spend month and amount spent in that month for each card type
+
+##write a query to print highest spend month and amount spent in that month for each card type
 with cte1 as(
 select card_type, datepart(month, transaction_date) as month, datepart(year,transaction_date) as year, sum(amount) as month_spend
 from [dbo].[credit_card_transcations]
@@ -39,19 +38,16 @@ select *, dense_rank()over(partition by card_type order by month_spend desc) as 
 from cte1)
 select * from rnking
 where rnk=1
---Observation: read question thrice and understand the schema how it will be and what is the desired output
 
 
--- write a query to print the transaction details(all columns from the table) for each card type when it reaches a cumulative of 1000000 total spends(We should have 4 rows in the o/p one for each card type)
+##write a query to print the transaction details(all columns from the table) for each card type when it reaches a cumulative of 1000000 total spends(We should have 4 rows in the o/p one for each card type)
 with cte1 as
 (select *, sum(amount) over(partition by card_type order by transaction_date, transaction_id asc) as cumulative_spend from [dbo].[credit_card_transcations])
 select * from (select *,dense_rank() over(partition by card_type order by cumulative_spend desc) as rnk from cte1 where cumulative_spend<=1000000)A
 where rnk=1
----error: An expression of non-boolean type specified in a context where a condition is expected: something that isn’t a TRUE/FALSE expression in a place where it was expecting a condition, usually inside a:
 
---WHERE clause, IF statement, CASE condition, JOIN ON clause
 
---write a query to find city which had lowest percentage spend for gold card type.
+##write a query to find city which had lowest percentage spend for gold card type.
 --steps to follow: 1)where- card filtering, group by city, sum(spend), cross join with sum(total sales), % percentage, order by asc, top 1 record
 with cte1 as(
 select city, sum(amount) as city_amount
@@ -63,7 +59,7 @@ from cte1 ct,(select cast(sum(amount) as bigint) as total_spend from [dbo].[cred
 order by percentage_contribution
 
 
---write a query to print 3 columns:  city, highest_expense_type , lowest_expense_type (example format : Delhi , bills, Fuel)
+##write a query to print 3 columns:  city, highest_expense_type , lowest_expense_type (example format : Delhi , bills, Fuel)
 --steps to follow: Expense_type-Highest/lowest decided by amount spend
 --group by exp_type, city, sum(amount)
 --, rank() partition by exp_type, city order by amount_spend desc
@@ -77,7 +73,7 @@ from ranking
 group by city
 
 
--- write a query to find percentage contribution of spends by females for each expense type
+## write a query to find percentage contribution of spends by females for each expense type
 with cte1 as
 (select exp_type, sum(amount) as exp_type_amount
 from [dbo].[credit_card_transcations]
@@ -99,7 +95,7 @@ order by percentage_contribution_female desc
 
 
 
---which card and expense type combination saw highest month over month growth in Jan-2014.
+##which card and expense type combination saw highest month over month growth in Jan-2014.
 --steps to follow:
 with cte1 as(
 select card_type, exp_type, format(cast(transaction_date as date), 'yyyy-MM') as Transacation_monthYear, sum(amount) as Actual_spend
@@ -113,7 +109,7 @@ from (select *, lag( Actual_spend) over(partition by card_type, exp_type order b
 select * from [dbo].[credit_card_transcations]
 
 
---during weekends which city has highest total spend to total no of transcations ratio 
+##during weekends which city has highest total spend to total no of transcations ratio 
 select top 1 city, sum(amount)*1.0/count(transaction_id) as total_spend_total_no_of_transcations_ratio from [dbo].[credit_card_transcations]
 where datename(weekday,cast(transaction_date as date)) in ('Saturday', 'Sunday')
 group by city
@@ -123,7 +119,7 @@ order by total_spend_total_no_of_transcations_ratio desc
 ---datepart(weekday,date)--[1,2....7]
 
 
-select * from [dbo].[credit_card_transcations]
+##select * from [dbo].[credit_card_transcations]
 --which city took least number of days to reach its 500th transaction after the first transaction in that city
 --steps to follow:
 with cte1 as(select *, dense_rank() over(partition by city order by transaction_date, transaction_id) as rnk from [dbo].[credit_card_transcations])
