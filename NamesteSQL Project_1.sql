@@ -15,7 +15,7 @@ Amount: The amount of the transaction. (Number) */
  
 
 
-##write a query to print top 5 cities with highest spends and their percentage contribution of total credit card spends.
+## write a query to print top 5 cities with highest spends and their percentage contribution of total credit card spends.
 --steps to follow:
 with city_spend as (
 select city, sum(amount) as city_spend
@@ -28,7 +28,7 @@ from city_spend cs, Total_spend ct
 order by cs.city_spend desc
 
 
-##write a query to print highest spend month and amount spent in that month for each card type
+## write a query to print highest spend month and amount spent in that month for each card type
 with cte1 as(
 select card_type, datepart(month, transaction_date) as month, datepart(year,transaction_date) as year, sum(amount) as month_spend
 from [dbo].[credit_card_transcations]
@@ -59,7 +59,7 @@ from cte1 ct,(select cast(sum(amount) as bigint) as total_spend from [dbo].[cred
 order by percentage_contribution
 
 
-##write a query to print 3 columns:  city, highest_expense_type , lowest_expense_type (example format : Delhi , bills, Fuel)
+## write a query to print 3 columns:  city, highest_expense_type , lowest_expense_type (example format : Delhi , bills, Fuel)
 --steps to follow: Expense_type-Highest/lowest decided by amount spend
 --group by exp_type, city, sum(amount)
 --, rank() partition by exp_type, city order by amount_spend desc
@@ -95,7 +95,7 @@ order by percentage_contribution_female desc
 
 
 
-##which card and expense type combination saw highest month over month growth in Jan-2014.
+## which card and expense type combination saw highest month over month growth in Jan-2014.
 --steps to follow:
 with cte1 as(
 select card_type, exp_type, format(cast(transaction_date as date), 'yyyy-MM') as Transacation_monthYear, sum(amount) as Actual_spend
@@ -109,7 +109,7 @@ from (select *, lag( Actual_spend) over(partition by card_type, exp_type order b
 select * from [dbo].[credit_card_transcations]
 
 
-##during weekends which city has highest total spend to total no of transcations ratio 
+## during weekends which city has highest total spend to total no of transcations ratio 
 select top 1 city, sum(amount)*1.0/count(transaction_id) as total_spend_total_no_of_transcations_ratio from [dbo].[credit_card_transcations]
 where datename(weekday,cast(transaction_date as date)) in ('Saturday', 'Sunday')
 group by city
@@ -119,7 +119,7 @@ order by total_spend_total_no_of_transcations_ratio desc
 ---datepart(weekday,date)--[1,2....7]
 
 
-##select * from [dbo].[credit_card_transcations]
+## select * from [dbo].[credit_card_transcations]
 --which city took least number of days to reach its 500th transaction after the first transaction in that city
 --steps to follow:
 with cte1 as(select *, dense_rank() over(partition by city order by transaction_date, transaction_id) as rnk from [dbo].[credit_card_transcations])
